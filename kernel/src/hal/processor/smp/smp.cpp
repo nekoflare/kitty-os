@@ -85,7 +85,7 @@ namespace SMP
 
         gdt_init();
         idt_init();
-        // Multitasking::PerCoreInitialize(info->processor_id);
+        Multitasking::PerCoreInitialize(info->processor_id);
 
         std::printf("Hello! I'm CPU#%d! LAPIC ID: %llx\n", info->processor_id, info->lapic_id);
     
