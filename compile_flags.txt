@@ -1,0 +1,13 @@
+-Ikernel/src
+-Wall
+-Wextra
+-ffreestanding
+-fno-stack-protector
+-fno-stack-check
+-fno-lto
+-m64
+-mno-mmx
+-msse
+-msse2
+-mno-red-zone
+-static

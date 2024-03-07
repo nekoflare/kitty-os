@@ -10,7 +10,6 @@ ENTRY(_start)
 PHDRS
 {
     text    PT_LOAD    FLAGS((1 << 0) | (1 << 2)) ; /* Execute + Read */
-    drivers PT_LOAD    FLAGS((1 << 0) | (1 << 2) | (1 << 1)) ; /* Execute + Read + Write */
     rodata  PT_LOAD    FLAGS((1 << 2)) ;            /* Read only */
     data    PT_LOAD    FLAGS((1 << 1) | (1 << 2)) ; /* Write + Read */
     dynamic PT_DYNAMIC FLAGS((1 << 1) | (1 << 2)) ; /* Dynamic PHDR for relocations */
@@ -31,17 +30,16 @@ SECTIONS
     /* Move to the next memory page for .rodata */
     . += CONSTANT(MAXPAGESIZE);
 
-    .drivers : {
-        DRIVERS_START = .;
-        KEEP(*(.drivers))
-        DRIVERS_END = .;
-    } :drivers
-
-    /* Move to the next memory page for .rodata */
-    . += CONSTANT(MAXPAGESIZE);
-
     .rodata : {
         *(.rodata .rodata.*)
+    } :rodata
+
+    /* C++ is a language that allows for global constructors. In order to obtain the */
+    /* address of the ".init_array" section we need to define a symbol for it. */
+    .init_array : {
+        __init_array = .;
+        *(.init_array .init_array.*)
+        __init_array_end = .;
     } :rodata
 
     /* Move to the next memory page for .data */

@@ -1,0 +1,369 @@
+#include <hal/processor/interrupts/idt.hpp>
+#include <libc/stdio.hpp>
+#include <hal/processor/access.hpp>
+#include <hal/processor/smp/smp.hpp>
+#include <hal/processor/interrupts/isrs.hpp>
+#include <graphics/graphics.hpp>
+
+__attribute__((aligned(0x10)))
+gate_desc_64 idt_entries[256] = {
+	IDT_ENTRY(&ISR0, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR1, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR2, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR3, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR4, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR5, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR6, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR7, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR8, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR9, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR10, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR11, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR12, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR13, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR14, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR15, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR16, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR17, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR18, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR19, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR20, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR21, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR22, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR23, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR24, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR25, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR26, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR27, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR28, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR29, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR30, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR31, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR32, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR33, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR34, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR35, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR36, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR37, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR38, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR39, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR40, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR41, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR42, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR43, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR44, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR45, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR46, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR47, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR48, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR49, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR50, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR51, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR52, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR53, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR54, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR55, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR56, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR57, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR58, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR59, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR60, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR61, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR62, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR63, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR64, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR65, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR66, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR67, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR68, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR69, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR70, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR71, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR72, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR73, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR74, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR75, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR76, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR77, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR78, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR79, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR80, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR81, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR82, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR83, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR84, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR85, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR86, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR87, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR88, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR89, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR90, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR91, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR92, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR93, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR94, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR95, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR96, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR97, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR98, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR99, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR100, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR101, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR102, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR103, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR104, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR105, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR106, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR107, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR108, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR109, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR110, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR111, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR112, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR113, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR114, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR115, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR116, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR117, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR118, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR119, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR120, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR121, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR122, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR123, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR124, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR125, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR126, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR127, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR128, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR129, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR130, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR131, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR132, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR133, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR134, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR135, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR136, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR137, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR138, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR139, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR140, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR141, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR142, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR143, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR144, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR145, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR146, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR147, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR148, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR149, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR150, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR151, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR152, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR153, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR154, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR155, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR156, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR157, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR158, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR159, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR160, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR161, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR162, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR163, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR164, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR165, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR166, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR167, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR168, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR169, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR170, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR171, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR172, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR173, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR174, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR175, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR176, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR177, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR178, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR179, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR180, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR181, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR182, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR183, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR184, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR185, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR186, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR187, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR188, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR189, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR190, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR191, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR192, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR193, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR194, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR195, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR196, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR197, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR198, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR199, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR200, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR201, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR202, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR203, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR204, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR205, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR206, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR207, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR208, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR209, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR210, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR211, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR212, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR213, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR214, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR215, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR216, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR217, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR218, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR219, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR220, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR221, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR222, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR223, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR224, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR225, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR226, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR227, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR228, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR229, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR230, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR231, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR232, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR233, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR234, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR235, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR236, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR237, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR238, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR239, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR240, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR241, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR242, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR243, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR244, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR245, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR246, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR247, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR248, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR249, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR250, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR251, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR252, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR253, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR254, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+	IDT_ENTRY(&ISR255, 0x8, IDT::Attributes::PRESENT | IDT::Attributes::RING0 | IDT::Attributes::INTERRUPT_GATE),
+};
+
+const char* exceptions[32] = {
+    "Division Error",
+    "Debug",
+    "Non-maskable Interrupt",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Coprocessor Segment Overrun",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack-Segment Fault",
+	"General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 Floating-Point Exception",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD Floating-Point Exception",
+    "Virtualization Exception",
+    "Control Protection Exception",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+	"Reserved",
+    "Hypervisor Injection Exception",
+    "VMM Communication Exception",
+    "Security Exception",
+    "Reserved"
+};
+
+void idt_init()
+{
+    idtr _idtr;
+
+    _idtr.size = sizeof(idt_entries) - 1;
+    _idtr.offset = (uint64_t)&idt_entries;
+
+    idt_load(&_idtr);
+}
+
+void (*interrupt_endpoints[256])(registers_t*) = { nullptr };
+
+void interrupt_handler(registers_t regs)
+{
+    char fxsave_region[512] __attribute__((aligned(16)));
+    asm volatile("fxsave %0 " :: "m"(fxsave_region));
+    
+    /*
+        Grammar police (imaami) added another "r" to the word "occurred".
+    */
+
+    if (interrupt_endpoints[regs.interrupt] != nullptr)
+	{
+		interrupt_endpoints[regs.interrupt](&regs);
+		return;
+	}
+
+    std::use_truncated_llh = false;
+
+    cpu_data_t* cpu_data = (cpu_data_t*)rdmsr(0xC0000101);
+
+    std::printf("An interrupt has occured on CPU#%d.\n", cpu_data->processor_id);
+
+    std::printf("INT: %x\n", static_cast<int>(regs.interrupt));
+
+    std::printf("CS:RIP: %x:%llx\n", (unsigned int)regs.cs, regs.rip);
+    std::printf("RAX: %llx RBX: %llx RCX: %llx RDX: %llx\n", regs.rax, regs.rbx, regs.rcx, regs.rdx);
+    std::printf("RSI: %llx RDI: %llx SS:RSP: %llx:%llx RBP: %llx\n", regs.rsi, regs.rdi, regs.ss, regs.rsp, regs.rbp);
+    std::printf("R8: %llx R9: %llx R10: %llx\n", regs.r8, regs.r9, regs.r10);
+    std::printf("R11: %llx R12: %llx R13: %llx\n", regs.r11, regs.r12, regs.r13);
+    std::printf("R14: %llx R15: %llx\n", regs.r14, regs.r15);
+    
+    std::use_truncated_llh = true;
+    std::printf("CS: %llx DS: %llx SS: %llx ES: %llx FS: %llx GS: %llx\n",  regs.user_cs,regs.user_ds,regs.user_ss,regs.user_es,regs.user_fs,regs.user_gs);
+    std::use_truncated_llh = false;
+
+    asm volatile("fxrstor %0" :: "m"(fxsave_region));
+
+    if (0x20 > regs.interrupt)
+    {
+        std::printf("Exception : %s.\n", exceptions[regs.interrupt]);
+
+        for (;;);
+    }
+
+    return;
+}
+
+void enable_interrupts()
+{
+    __asm__ __volatile__("sti");
+}
+
+void disable_interrupts()
+{
+    __asm__ __volatile__("cli");
+}

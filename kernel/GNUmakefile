@@ -16,8 +16,12 @@ define DEFAULT_VAR =
 endef
 
 # It is suggested to use a custom built cross toolchain to build a kernel.
-# We are using the standard "cc" here, it may work by using
+# We are using the standard "c++" here, it may work by using
 # the host system's toolchain, but this is not guaranteed.
+override DEFAULT_CXX := c++
+$(eval $(call DEFAULT_VAR,CXX,$(DEFAULT_CXX)))
+
+# Same thing for "cc" (the C compiler).
 override DEFAULT_CC := cc
 $(eval $(call DEFAULT_VAR,CC,$(DEFAULT_CC)))
 
@@ -25,11 +29,15 @@ $(eval $(call DEFAULT_VAR,CC,$(DEFAULT_CC)))
 override DEFAULT_LD := ld
 $(eval $(call DEFAULT_VAR,LD,$(DEFAULT_LD)))
 
+# User controllable C++ flags.
+override DEFAULT_CXXFLAGS := -g -O2 -pipe
+$(eval $(call DEFAULT_VAR,CXXFLAGS,$(DEFAULT_CXXFLAGS)))
+
 # User controllable C flags.
 override DEFAULT_CFLAGS := -g -O2 -pipe
 $(eval $(call DEFAULT_VAR,CFLAGS,$(DEFAULT_CFLAGS)))
 
-# User controllable C preprocessor flags. We set none by default.
+# User controllable C/C++ preprocessor flags. We set none by default.
 override DEFAULT_CPPFLAGS :=
 $(eval $(call DEFAULT_VAR,CPPFLAGS,$(DEFAULT_CPPFLAGS)))
 
@@ -41,11 +49,10 @@ $(eval $(call DEFAULT_VAR,NASMFLAGS,$(DEFAULT_NASMFLAGS)))
 override DEFAULT_LDFLAGS :=
 $(eval $(call DEFAULT_VAR,LDFLAGS,$(DEFAULT_LDFLAGS)))
 
-# Internal C flags that should not be changed by the user.
-override CFLAGS += \
+# Internal flags shared by both C and C++ compilers.
+override SHARED_FLAGS := \
     -Wall \
     -Wextra \
-    -std=gnu11 \
     -ffreestanding \
     -fno-stack-protector \
     -fno-stack-check \
@@ -53,13 +60,25 @@ override CFLAGS += \
     -fPIE \
     -m64 \
     -march=x86-64 \
-    -mno-80387 \
     -mno-mmx \
-    -mno-sse \
-    -mno-sse2 \
-    -mno-red-zone
+    -msse \
+    -msse2 \
+    -mno-red-zone \
+    -static \
 
-# Internal C preprocessor flags that should not be changed by the user.
+# Internal C++ flags that should not be changed by the user.
+override CXXFLAGS += \
+    -std=c++20 \
+    -fno-rtti \
+    -fno-exceptions \
+    $(SHARED_FLAGS)
+
+# Internal C flags that should not be changed by the user.
+override CFLAGS += \
+    -std=gnu11 \
+    $(SHARED_FLAGS)
+
+# Internal C/C++ preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
     -I src \
     $(CPPFLAGS) \
@@ -82,45 +101,14 @@ override NASMFLAGS += \
     -Wall \
     -f elf64
 
-# Use "g++" as the C++ compiler.
-override DEFAULT_CXX := g++
-$(eval $(call DEFAULT_VAR,CXX,$(DEFAULT_CXX)))
-
-# User controllable C++ flags.
-override DEFAULT_CXXFLAGS := -g -O2 -pipe
-$(eval $(call DEFAULT_VAR,CXXFLAGS,$(DEFAULT_CXXFLAGS)))
-
-# Internal C++ flags that should not be changed by the user.
-override CXXFLAGS += \
-    -Wall \
-    -Wextra \
-    -std=gnu++11 \
-    -ffreestanding \
-    -fno-stack-protector \
-    -fno-stack-check \
-    -fno-lto \
-    -fPIE \
-    -m64 \
-    -march=x86-64 \
-    -mno-80387 \
-    -mno-mmx \
-    -mno-sse \
-    -mno-sse2 \
-    -mno-red-zone \
-    -fno-exceptions \
-    -fno-rtti
-
-# Compilation rules for *.cpp files (C++ source files).
-override CXXFILES := $(shell cd src && find -L * -type f -name '*.cpp')
-override OBJ += $(addprefix obj/,$(CXXFILES:.cpp=.cpp.o))
-
-# Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
+# Use "find" to glob all *.cpp, *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
+override CXXFILES := $(shell cd src && find -L * -type f -name '*.cpp')
 override CFILES := $(shell cd src && find -L * -type f -name '*.c')
 override ASFILES := $(shell cd src && find -L * -type f -name '*.S')
 override NASMFILES := $(shell cd src && find -L * -type f -name '*.asm')
-override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
-override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
+override OBJ := $(addprefix obj/,$(CXXFILES:.cpp=.cpp.o) $(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o))
+override HEADER_DEPS := $(addprefix obj/,$(CXXFILES:.cpp=.cpp.d) $(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
 
 # Default target.
 .PHONY: all
@@ -130,7 +118,7 @@ src/limine.h:
 	curl -Lo $@ https://github.com/limine-bootloader/limine/raw/trunk/limine.h
 
 # Link rules for the final kernel executable.
-obj/$(KERNEL): GNUmakefile linker.ld $(OBJ)
+bin/$(KERNEL): GNUmakefile linker.ld $(OBJ)
 	mkdir -p "$$(dirname $@)"
 	$(LD) $(OBJ) $(LDFLAGS) -o $@
 
@@ -138,9 +126,9 @@ obj/$(KERNEL): GNUmakefile linker.ld $(OBJ)
 -include $(HEADER_DEPS)
 
 # Compilation rules for *.cpp files.
-bin/$(KERNEL): GNUmakefile linker.ld $(OBJ)
+obj/%.cpp.o: src/%.cpp GNUmakefile src/limine.h
 	mkdir -p "$$(dirname $@)"
-	$(LD) $(filter-out obj/%.cpp.o, $(OBJ)) $(LDFLAGS) -o $@ # Exclude .cpp.o files from the linking step
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Compilation rules for *.c files.
 obj/%.c.o: src/%.c GNUmakefile src/limine.h
@@ -165,4 +153,3 @@ clean:
 .PHONY: distclean
 distclean: clean
 	rm -f src/limine.h
-

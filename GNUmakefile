@@ -33,26 +33,26 @@ all-hdd: $(IMAGE_NAME).hdd
 
 .PHONY: run
 run: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 4800M -drive file=$(IMAGE_NAME).iso,if=none,id=nvm,format=raw -device nvme,serial=deadbeef,drive=nvm -boot d -serial file:/dev/stdout 
+	qemu-system-x86_64 -cpu qemu64,+fsgsbase,+syscall,+rdseed -d int -no-shutdown -no-reboot -M smm=off -smp 6 -M q35 -m 4.5G -cdrom $(IMAGE_NAME).iso -boot d
 
 .PHONY: run-uefi
 run-uefi: ovmf $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d -serial file:serial.log
+	qemu-system-x86_64 -M q35 -d int -no-shutdown -no-reboot -M smm=off -smp 6 -cpu qemu64,+fsgsbase -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
 
 .PHONY: run-hdd
 run-hdd: $(IMAGE_NAME).hdd
-	qemu-system-x86_64 -M q35 -m 2G -hda $(IMAGE_NAME).hdd -serial file:serial.log
+	qemu-system-x86_64 -M q35 -m 2G -hda $(IMAGE_NAME).hdd
 
 .PHONY: run-hdd-uefi
 run-hdd-uefi: ovmf $(IMAGE_NAME).hdd
-	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -hda $(IMAGE_NAME).hdd -serial file:serial.log
+	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -hda $(IMAGE_NAME).hdd
 
 ovmf:
 	mkdir -p ovmf
 	cd ovmf && curl -Lo OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd
 
 limine:
-	git clone https://github.com/limine-bootloader/limine.git --branch=v5.x-branch-binary --depth=1
+	git clone https://github.com/limine-bootloader/limine.git --branch=v6.x-branch-binary --depth=1
 	$(MAKE) -C limine \
 		CC="$(HOST_CC)" \
 		CFLAGS="$(HOST_CFLAGS)" \
@@ -72,6 +72,11 @@ $(IMAGE_NAME).iso: limine kernel
 	mkdir -p iso_root/EFI/BOOT
 	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
+	# cp -v files/autorun.ico iso_root/
+	# mkdir -p iso_root/registry/kernel/
+	# cp -v files/registry/kernel/SysInfo.kr iso_root/registry/kernel/SysInfo.kr
+	cp -r files/* iso_root/
+	# tree iso_root/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \

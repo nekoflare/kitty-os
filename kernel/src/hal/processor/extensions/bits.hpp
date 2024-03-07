@@ -1,0 +1,28 @@
+#ifndef PROCESSOR_CPUID_BITS_HPP
+#define PROCESSOR_CPUID_BITS_HPP
+
+// Stored in EDX
+#define SSE_CPUID_FUNCTION 0x00000001
+#define SSE_CPUID_BIT (1 << 25)
+
+// Stored in EDX
+#define SSE2_CPUID_FUNCTION 0x00000001
+#define SSE3_CPUID_BIT (1 << 26)
+
+// Stored in ECX
+#define SSSE3_CPUID_FUNCTION 0x00000001
+#define SSSE3_CPUID_BIT (1 << 9)
+
+// Stored in ECX
+#define SSE4_1_CPUID_FUNCTION 0x00000001
+#define SSE4_1_CPUID_BIT (1 << 19)
+
+#define SSE4_2_CPUID_FUNCTION 0x00000001
+#define SSE4_2_CPUID_BIT (1 << 20)
+
+#define SSE4A_CPUID_FUNCTION 0x00000001
+#define SSE4A_CPUID_BIT (1 << 6)
+
+
+
+#endif
