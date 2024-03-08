@@ -35,28 +35,25 @@ namespace Multitasking
         void* syscall_stack_phys = Memory::alloc_page();
         uint64_t syscall_stack_virt = Memory::get_virtual_address((uint64_t)syscall_stack_phys);
 
+        syscall_stack_virt += (PAGE_SIZE - 1); // To the bottom.
+
         // Fill it
         // Load RSP0
-        this_tss->io_map_base_address = sizeof(tss_entry_t);
-        this_tss->rsp0 = syscall_stack_virt;
+        this_tss->iopb = sizeof(tss_entry_t);
+        this_tss->rsp0_low = (syscall_stack_virt & 0xffffffff00000000) >> 32;
+        this_tss->rsp0_high = syscall_stack_virt & 0x00000000ffffffff;
 
         // Set it
         gdt[6].base0 = ((uint64_t)this_tss & 0xffffffff00000000) >> 32;
         gdt[6].base1 = ((uint64_t)this_tss & 0x00000000ffff0000) >> 16;
         gdt[6].base2 = ((uint64_t)this_tss & 0x000000000000ffff);
-        gdt[6].limit0 = 0;
-        gdt[6].limit1 = sizeof(tss_entry_t);
+        gdt[6].limit0 = sizeof(tss_entry_t);
+        gdt[6].limit1 = 0;
         gdt[6].access_byte = 0x89;
-        gdt[6].flags = 0x40;
+        gdt[6].flags = SIZE_FLAG;
 
-        // Load it 
-        unsigned short ax = 0x28;
-    
-        __asm__ __volatile__(
-            "ltr %0\n"
-            :
-            : "a"(ax)
-        );
+        // Load it
+        x86_load_tss();
 
         // Release spin lock
         per_core_init_spinlock.unlock();

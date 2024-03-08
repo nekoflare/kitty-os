@@ -8,20 +8,28 @@
 
 struct tss_entry_t
 {
-    uint16_t io_map_base_address : 16;
-    uint16_t reserved0 : 16;
-    uint32_t reserved1, reserved2;
-    uint32_t ist7_h, ist7_l;
-    uint32_t ist6_h, ist6_l;
-    uint32_t ist5_h, ist5_l;
-    uint32_t ist4_h, ist4_l;
-    uint32_t ist3_h, ist3_l;
-    uint32_t ist2_h, ist2_l;
-    uint32_t ist1_h, ist1_l;
+    uint32_t reserved0;
+    uint32_t rsp0_low;
+    uint32_t rsp0_high;
+    uint32_t rsp1_low;
+    uint32_t rsp1_high;
+    uint32_t rsp2_low;
+    uint32_t rsp2_high;
+    uint32_t reserved1;
+    uint32_t reserved2;
+    uint32_t ist1_low, ist1_high;
+    uint32_t ist2_low, ist2_high;
+    uint32_t ist3_low, ist3_high;
+    uint32_t ist4_low, ist4_high;
+    uint32_t ist5_low, ist5_high;
+    uint32_t ist6_low, ist6_high;
+    uint32_t ist7_low, ist7_high;
     uint32_t reserved3, reserved4;
-    uint64_t rsp2, rsp1, rsp0;
-    uint32_t reserved5;
+    uint16_t reserved5;
+    uint16_t iopb;
 } __attribute__((packed));
+
+extern "C" void x86_load_tss();
 
 namespace Multitasking
 {

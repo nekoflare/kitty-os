@@ -34,19 +34,12 @@ enable_sse:
 
 _start:
     call enable_sse
-    
+
+        
     ;; enable cache 
     mov rax, cr0
     or rax, 1 << 30
     mov cr0, rax
-
-    ;; Enable syscall extensions.
-    mov rcx, 0xC0000080 ;; EFER MSR
-    rdmsr               ;; edx : eax has the contents.
-    or rax, 1           ;; enable syscall extensions by setting bit 0.
-
-    ;; Write MSR back
-    wrmsr
 
     ;; Enable PSE (Page Size Extensions)
     mov rax, cr4
@@ -54,14 +47,14 @@ _start:
     mov cr4, rax
 
     ;; Enable VMXE (Virtual Machine Extensions Enable)
-    mov rax, cr4
-    or rax, 1 << 13
-    mov cr4, rax
+    ;;mov rax, cr4
+    ;;or rax, 1 << 13
+    ;;mov cr4, rax
 
     ;; Enable SMXE (Safer Mode Extensions Enable)
-    mov rax, cr4
-    or rax, 1 << 14
-    mov cr4, rax
+    ;;mov rax, cr4
+    ;;or rax, 1 << 14
+    ;;mov cr4, rax
 
     ;; Enable FSGSBASE (Enables rdfsbase rdgsbase wrfsbase and wrgsbase)
     mov rax, cr4
@@ -77,6 +70,14 @@ _start:
     mov rax, cr4
     or rax, 1 << 5
     mov cr4, rax
+
+    ;; Enable syscall extensions.
+    mov rcx, 0xC0000080 ;; EFER MSR
+    rdmsr               ;; edx : eax has the contents.
+    or rax, 1           ;; enable syscall extensions by setting bit 0.
+
+    ;; Write MSR back
+    wrmsr
 
     ;; Execute disable part.
     mov rcx, 0xC000008
