@@ -78,7 +78,7 @@ namespace Graphics
 
     namespace QuickDraw
     {
-        ERR_CODE QDInit();
+        ERROR_CODE QDInit();
         void DrawPixel(uint screen_id, uint x, uint y, uchar r, uchar g, uchar b);
         void DrawRectangle(uint screen_id, uint x, uint y, uint w, uint h, uchar r, uchar g, uchar b);
         void DrawFilledRectangle(uint screen_id, uint x, uint y, uint w, uint h, uchar r, uchar g, uchar b);

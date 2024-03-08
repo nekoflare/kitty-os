@@ -35,7 +35,7 @@ struct acpi_sdt_header
 #define RSDP_VERSION_1 0
 #define RSDP_NEW_VERSION 2
 
-namespace ACPI
+namespace Acpi
 {
     void acpi_initialize();
 };

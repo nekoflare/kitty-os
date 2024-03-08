@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <libc/stdio.hpp>
 
-namespace ACPI
+namespace Acpi
 {
     struct limine_rsdp_request rsdp_request = {
         .id = LIMINE_RSDP_REQUEST,

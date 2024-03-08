@@ -59,7 +59,7 @@ extern "C" void kernel_main()
     }
 
     auto qd_error = Graphics::QuickDraw::QDInit();
-    if (qd_error != ERR_SUCCESS)
+    if (qd_error != SUCCESS)
     {
         hcf();
     }

@@ -11,15 +11,15 @@ namespace Graphics
     uint framebuffer_count = 0;
 }
 
-ERR_CODE Graphics::QuickDraw::QDInit()
+ERROR_CODE Graphics::QuickDraw::QDInit()
 {
-    Graphics::LastError = ERR_SUCCESS;
+    Graphics::LastError = SUCCESS;
 
     // Check count of framebuffers.
     auto fb_count = KeGetFramebufferCount();
     if (0 >= fb_count)
     {
-        return ERR_NO_FRAMEBUFFERS;
+        return NO_FRAMEBUFFERS;
     }
 
     auto framebuffers = KeGetFramebufferResponse();
@@ -28,10 +28,10 @@ ERR_CODE Graphics::QuickDraw::QDInit()
 
     if (framebuffers == nullptr)
     {
-        return ERR_FRAMEBUFFER_NULL;
+        return FRAMEBUFFER_NULL;
     }
 
-    return ERR_SUCCESS;
+    return SUCCESS;
 }
 
 static uint32_t calculate_color32(limine_framebuffer* this_framebuffer, char r, char g, char b)
@@ -60,14 +60,12 @@ void Graphics::QuickDraw::DrawPixel(uint screen_id, uint x, uint y, uchar r, uch
 	// Check if screen_id is in boundaries.
     if (screen_id >= Graphics::framebuffer_count)
     {
-        Graphics::LastError = ERR_SCREEN_OOB;
         return;
     }
 
     // Check if X and Y is in boundaries.
     if (x >= Graphics::limine_framebuffers[screen_id]->width || y >= Graphics::limine_framebuffers[screen_id]->height)
     {
-        Graphics::LastError = ERR_PIXEL_POS_OOB;
         return;
     }
 
@@ -81,11 +79,8 @@ void Graphics::QuickDraw::DrawPixel(uint screen_id, uint x, uint y, uchar r, uch
     *reinterpret_cast<uint32_t*>(Graphics::limine_framebuffers[screen_id]->address + pixel_address) = color;
 
     // Optionally, you may need to flush or invalidate the framebuffer cache depending on your platform.
-    // This ensures that the pixel value is written to the framebuffer immediately.
+    // This ensures that the pixel value is written to the framebuffer immediately.z
     // For example, on some ARM platforms, you might use specific cache maintenance instructions.
-
-    // Update the last error code.
-    Graphics::LastError = ERR_SUCCESS;
 }
 
 void Graphics::QuickDraw::DrawRectangle(uint screen_id, uint x, uint y, uint w, uint h, uchar r, uchar g, uchar b)
@@ -156,8 +151,6 @@ void Graphics::QuickDraw::DrawLine(uint screen_id, uint x1, uint y1, uint x2, ui
             y1 += sy;
         }
     }
-
-    Graphics::LastError = ERR_SUCCESS;
 }
 
 void Graphics::QuickDraw::put_bitmap_image_data(uint screen_id, char* bitmap_data, unsigned int x, unsigned int y, unsigned int width, unsigned int height)

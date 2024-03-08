@@ -10,5 +10,4 @@
 #define CONST __attribute__((const))
 #define PURE __attribute__((pure))
 #define USED __attribute__((used))
-#define FORMAT(fmt, arg) __attribute__((format(printf, fmt, arg)))
 #endif // ATTRIBUTES_HPP

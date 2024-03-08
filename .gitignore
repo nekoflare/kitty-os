@@ -3,6 +3,6 @@
 *.iso
 *.hdd
 /.vscode
-/kernel/bin/kernel
-/kernel/obj/
-/builds/*.iso
+kernel/bin/kernel
+kernel/obj/
+builds/*.iso
