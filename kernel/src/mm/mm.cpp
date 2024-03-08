@@ -31,7 +31,7 @@ namespace Memory
     limine_hhdm_response* _limine_hhdm_response = nullptr; // Define and initialize
 }
 
-void* Memory::GetPML4Pointer()
+void* Memory::get_pml4()
 {
     uint64_t hhdm_offset = Memory::_limine_hhdm_response->offset;
 
@@ -43,12 +43,12 @@ void* Memory::GetPML4Pointer()
     return (void*) pml4;
 }
 
-uint64_t Memory::GetVirtualAddress(uint64_t paddr)
+uint64_t Memory::get_virtual_address(uint64_t paddr)
 {
     return paddr + Memory::_limine_hhdm_response->offset;
 }
 
-void Memory::Init()
+void Memory::init()
 {
     // Checking for null pointers.
     // TODO: Add logging.
@@ -68,7 +68,7 @@ void Memory::Init()
     Memory::_limine_hhdm_response = Memory::_limine_hhdm_request.response;
 
     // Get PML4 and load it to variable.
-    Memory::pml4 = (u64*) Memory::GetPML4Pointer();
+    Memory::pml4 = (u64*) Memory::get_pml4();
 
     for (u64 i = 0; Memory::limine_memmap_entry_count > i; i++)
     {
@@ -132,7 +132,7 @@ void Memory::Init()
                 entry->length -= bytes_for_bitmap;
 
                 // Get virtual address for the bitmap.
-                uint64_t virt_address = Memory::GetVirtualAddress(phys_address);
+                uint64_t virt_address = Memory::get_virtual_address(phys_address);
 
                 // Show the bitmap.
                 std::printf("Here's the address of bitmap: %llx\n", virt_address);
@@ -159,7 +159,7 @@ void Memory::Init()
         {
             case LIMINE_MEMMAP_USABLE:
                 // Mark this in bitmap as usable (0).
-                MarkPagesInRange(bitmap, mmap_entry->base, mmap_entry->base + mmap_entry->length, true);
+                mark_pages_in_range(bitmap, mmap_entry->base, mmap_entry->base + mmap_entry->length, true);
                 break;
         }
     }
@@ -170,7 +170,7 @@ void Memory::Init()
     std::printf("Total memory (KB): %lld\n", mm_total_memory / 1024);
 }
 
-void Memory::MarkPage(u8* bitmap, u64 page)
+void Memory::mark_page(u8* bitmap, u64 page)
 {
     u64 byte_index = page / 8;
     u64 bit_index = page % 8;
@@ -178,7 +178,7 @@ void Memory::MarkPage(u8* bitmap, u64 page)
     bitmap[byte_index] |= (1 << bit_index);
 }
 
-void Memory::UnmarkPage(u8* bitmap, u64 page)
+void Memory::unmark_page(u8* bitmap, u64 page)
 {
     u64 byte_index = page / 8;
     u64 bit_index = page % 8;   
@@ -186,7 +186,7 @@ void Memory::UnmarkPage(u8* bitmap, u64 page)
     bitmap[byte_index] &= ~(1 << bit_index);
 }
 
-void Memory::MarkPagesInRange(u8* bitmap, u64 start_addr, u64 end_addr, bool unmark)
+void Memory::mark_pages_in_range(u8* bitmap, u64 start_addr, u64 end_addr, bool unmark)
 {
     u64 start_page = start_addr / PAGE_SIZE;
     u64 end_page = end_addr / PAGE_SIZE;
@@ -219,31 +219,31 @@ void Memory::MarkPagesInRange(u8* bitmap, u64 start_addr, u64 end_addr, bool unm
     return;
 }
 
-bool Memory::IsPageAvailable(u64 page) {
+bool Memory::is_page_available(u64 page) {
     u64 byte_index = page / 8;
     u64 bit_index = page % 8;
 
     return (bitmap[byte_index] & (1 << bit_index)) == 0;
 }
 
-u64 Memory::PageToPhysAddr(u64 page)
+u64 Memory::page_to_physical_address(u64 page)
 {
     return page * PAGE_SIZE;
 }
 
-void* Memory::AllocPage()
+void* Memory::alloc_page()
 {
     // find continous block of memory and return virtual address of it.
     bool found_block = false;
     u64 page = 0;
     while (!found_block)
     {
-        if (Memory::IsPageAvailable(page))
+        if (Memory::is_page_available(page))
         {
-            Memory::MarkPage(bitmap, page);
+            Memory::mark_page(bitmap, page);
             std::printf("Page: %lld\n", page);
             // return address of that page.
-            return (void*)Memory::PageToPhysAddr(page);
+            return (void*)Memory::page_to_physical_address(page);
         }
 
         page++;
@@ -252,12 +252,12 @@ void* Memory::AllocPage()
     return (void*)0xFFFFFFFFFFFFFFFF;
 }
 
-void Memory::FreePage(u64 page)
+void Memory::free_page(u64 page)
 {
-    Memory::UnmarkPage(bitmap, page);
+    Memory::unmark_page(bitmap, page);
 }
 
-void* Memory::KeMalloc(u64 len, u64 virt_address, u64 flags)
+void* Memory::malloc(u64 len, u64 virt_address, u64 flags)
 {
     // Alright, we gotta know how much memory we should allocate in pages.
     u64 pages = (len + PAGE_SIZE - 1) / PAGE_SIZE;

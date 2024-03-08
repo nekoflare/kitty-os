@@ -3,31 +3,31 @@
 
 namespace Power
 {
-    void ShutdownEmuBochs()
+    void shutdown_bochs()
     {
         Processor::outw(BOCHS_SHUTDOWN_PORT, BOCHS_SHUTDOWN_VALUE);
     }
 
-    void ShutdownEmuQemu()
+    void shutdown_qemu()
     {
         Processor::outw(QEMU_SHUTDOWN_PORT, QEMU_SHUTDOWN_VALUE);
     }
 
-    void ShutdownVMVBox()
+    void shutdown_virtualbox()
     {
         Processor::outw(VIRTUALBOX_SHUTDOWN_PORT, VIRTUALBOX_SHUTDOWN_VALUE);
     }
 
-    void ShutdownVMClHypervisor()
+    void shutdown_vmcl_hypervisor()
     {
         Processor::outb(CLOUD_HYPERVISOR_SHUTDOWN_PORT, CLOUD_HYPERVISOR_SHUTDOWN_VALUE);
     }
 
-    void Shutdown()
+    void shutdown()
     {
-        Power::ShutdownEmuBochs();
-        Power::ShutdownEmuQemu();
-        Power::ShutdownVMVBox();
-        Power::ShutdownVMClHypervisor();
+        Power::shutdown_bochs();
+        Power::shutdown_qemu();
+        Power::shutdown_virtualbox();
+        Power::shutdown_vmcl_hypervisor();
     }
 }

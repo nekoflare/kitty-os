@@ -59,31 +59,23 @@ namespace Memory
     extern limine_memmap_entry** limine_memmap_entries;
     extern u64 limine_memmap_entry_count;
 
-    void Init();
-    void PrintMemoryEntries();
-    void* GetPML4Pointer();
-    uint64_t GetVirtualAddress(uint64_t paddr);
+    void init();
+    void* get_pml4();
+    uint64_t get_virtual_address(uint64_t paddr);
 
     // Bitmap manipulation.
-    void MarkPage(u8* bitmap, uint64_t page_num);
-    void UnmarkPage(u8* bitmap, uint64_t page_num);
-    void MarkPagesInRange(u8* bitmap, uint64_t start_address, uint64_t end_address, bool is_zero);
-    bool IsPageAvailable(u64 page);
+    void mark_page(u8* bitmap, uint64_t page_num);
+    void unmark_page(u8* bitmap, uint64_t page_num);
+    void mark_pages_in_range(u8* bitmap, uint64_t start_address, uint64_t end_address, bool is_zero);
+    bool is_page_available(u64 page);
 
     // Virtual address manipulations and representations.
-    u64 AddressToPage(void* addr);
-    u64 PageToPhysAddr(u64 page);
-    bool PageExists(uint64_t page);
-    void PrintVirtualAddress(void* vaddr);
-
-    // Memory map things.
-    const char* GetMemmapTypeString(uint64_t type);
+    u64 page_to_physical_address(u64 page);
 
     // Allocating.
-    void* AllocPage();
-    void FreePage(u64 page);
-    void* KeMalloc(u64 len, u64 virt_address, u64 flags);
-    void KeFree(void* memory, u64 len);
+    void* alloc_page();
+    void free_page(u64 page);
+    void* malloc(u64 len, u64 virt_address, u64 flags);
 
     enum PageAttributes
     {

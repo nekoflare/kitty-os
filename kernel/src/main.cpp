@@ -75,7 +75,7 @@ extern "C" void kernel_main()
     gdt_init();
     idt_init();
 
-    Memory::Init();
+    Memory::init();
     SMP::init_smp();
 
     SMP::cpu_infos[0].is_dispatched = true;

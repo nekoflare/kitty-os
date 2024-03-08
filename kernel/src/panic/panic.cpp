@@ -1,6 +1,6 @@
 #include <panic/panic.hpp>
 
-void Kernel::Control::Panic(const char* error_string)
+void Kernel::Panic(const char* error_string)
 {
     for (;;);
 }

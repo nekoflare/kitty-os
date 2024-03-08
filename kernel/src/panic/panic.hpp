@@ -3,12 +3,7 @@
 
 namespace Kernel
 {
-    namespace Control
-    {
-        void Panic(
-            const char* error_string
-        );
-    }
+    void Panic(const char* error_string);
 }
 
 #endif

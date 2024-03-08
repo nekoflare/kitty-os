@@ -15,11 +15,11 @@
 
 namespace Power
 {
-    void ShutdownEmuBochs();
-    void ShutdownEmuQemu();
-    void ShutdownVMVBox();
-    void ShutdownVMClHypervisor();
-    void Shutdown();
+    void shutdown_bochs();
+    void shutdown_qemu();
+    void shutdown_virtualbox();
+    void shutdown_vmcl_hypervisor();
+    void shutdown();
 }
 
 #endif  

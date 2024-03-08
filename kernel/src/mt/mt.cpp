@@ -25,15 +25,15 @@ namespace Multitasking
         assert(core_count == 0, "Invalid amount of cores on the system.\n");
 
         // Allocate memory for TSS
-        void* phys_addr = Memory::AllocPage();
-        uint64_t virt_addr = Memory::GetVirtualAddress((uint64_t)phys_addr);
+        void* phys_addr = Memory::alloc_page();
+        uint64_t virt_addr = Memory::get_virtual_address((uint64_t)phys_addr);
 
         // Get the final tss.
         tss_entry_t* this_tss = (tss_entry_t*) virt_addr;
     
         // I guess I can set up new stack
-        void* syscall_stack_phys = Memory::AllocPage();
-        uint64_t syscall_stack_virt = Memory::GetVirtualAddress((uint64_t)syscall_stack_phys);
+        void* syscall_stack_phys = Memory::alloc_page();
+        uint64_t syscall_stack_virt = Memory::get_virtual_address((uint64_t)syscall_stack_phys);
 
         // Fill it
         // Load RSP0
