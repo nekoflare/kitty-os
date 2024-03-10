@@ -8,6 +8,8 @@ global _start
 
 %define SSE_BIT 1 << 25
 
+global enable_sse
+
 enable_sse:
     ;; Set CR4.OSFXSR
     mov rax, cr4

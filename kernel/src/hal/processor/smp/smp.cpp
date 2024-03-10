@@ -29,6 +29,8 @@ namespace SMP
         iic_spinlock.unlock();
     }
 
+    extern "C" void enable_sse();
+
     void init_smp()
     {
         num_cpus = smp_request.response->cpu_count;
@@ -83,12 +85,13 @@ namespace SMP
         wrmsr(0xC0000101, (uint64_t)&cpu_infos[info->processor_id]);
         asm volatile ("swapgs");
 
+        enable_sse();
         gdt_init();
         idt_init();
-        Multitasking::PerCoreInitialize(info->processor_id);
+        // Multitasking::PerCoreInitialize(info->processor_id);
 
         std::printf("Hello! I'm CPU#%d! LAPIC ID: %llx\n", info->processor_id, info->lapic_id);
-    
+        
         inc_inited_cpu();
 
         while(true)

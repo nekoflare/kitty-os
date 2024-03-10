@@ -39,13 +39,16 @@ namespace Gen2Reg
     } __attribute((packed));
 };
 
-float test_float = 100.200f;
-double test_double = 925.748;
+float           test_float      = 100.200f;
+double          test_double     = 925.748;
+unsigned int    verbosity_level = 3;   // Max verbosity level.
 
 Gen2Reg::Entry entries[] = {
-    {4,  0,  0, Gen2Reg::EntryType::REGISTRY_TREE, "",            "ROOT",        "00000000"},
-    {11, 4,  0, Gen2Reg::EntryType::REGISTRY_TREE, "ROOT",        "SKEY_KERNEL", "00000000"},
-    {11, 11, 8, Gen2Reg::EntryType::STRING,        "SKEY_KERNEL", "SYSTEM_NAME", "Kitty OS"},
+    {4,  0,  0,                     Gen2Reg::EntryType::REGISTRY_TREE,  "",            "ROOT",                   "00000000"},
+    {11, 4,  0,                     Gen2Reg::EntryType::REGISTRY_TREE,  "ROOT",        "SKEY_KERNEL",            "00000000"},
+    {11, 11, 8,                     Gen2Reg::EntryType::STRING,         "SKEY_KERNEL", "SYSTEM_NAME",            "Kitty OS"},
+    {14, 11, 8,                     Gen2Reg::EntryType::STRING,         "SKEY_KERNEL", "SYSTEM_VERSION",         "1.0 Beta"},
+    {22, 11, sizeof(unsigned int),  Gen2Reg::EntryType::DWORD,          "SKEY_KERNEL", "SYSTEM_VERBOSITY_LEVEL", (const char*)&verbosity_level},
     
     // Here are some test things.
     {4,  0, 0,               Gen2Reg::EntryType::REGISTRY_TREE, "",     "TEST",        "00000000"},

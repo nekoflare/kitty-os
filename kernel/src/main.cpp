@@ -21,6 +21,7 @@
 #include <acpi/acpi.hpp>
 #include <mt/mt.hpp>
 #include <kern_registry.hpp>
+#include <exec/elf/elf.hpp>
 
 LIMINE_BASE_REVISION(1)
 
@@ -66,30 +67,6 @@ extern "C" void kernel_main()
     }
 
     std::init_stdio();
-    
-    // Find registry files in the modules stack.
-    for (unsigned int i = 0; limine_modules.response->module_count > i; i++)
-    {
-        auto _Module = limine_modules.response->modules[i];
-
-        if (strcmp(_Module->cmdline, "sys_registry") == 0)
-        {
-            const char* registry = (const char*) _Module->address;
-            size_t length = _Module->size;
-
-            if (registry == nullptr)
-            {
-                std::printf("Registry address is null.\n");
-                hcf();
-            }
-
-            if (length == 0)
-            {
-                std::printf("Registry is empty.\n");
-                hcf();
-            }
-        } 
-    }
 
     for (uint i = 0; limine_modules.response->module_count > i; i++)
     {
@@ -109,7 +86,22 @@ extern "C" void kernel_main()
 
     PCI::scanPCI();
 
-    Multitasking::PerCoreInitialize(0);
+    // Find hello_world
+    for (uint32_t i = 0; limine_modules.response->module_count > i; i++)
+    {
+        auto& mod = limine_modules.response->modules[i];
+
+        if (strcmp(mod->cmdline, "hello_world") == 0)
+        {
+            std::printf("Found the hello_world application!\n");
+
+            ELF::print_information_elf64(mod->address);
+
+            return;
+        }
+    }
+
+    // Multitasking::PerCoreInitialize(0);
 
     std::printf("The address: %llx\n", (void*)&limine_modules);
     // We're done, just hang...
