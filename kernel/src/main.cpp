@@ -20,6 +20,7 @@
 #include <hal/processor/interrupts/idt.hpp>
 #include <acpi/acpi.hpp>
 #include <mt/mt.hpp>
+#include <kern_registry.hpp>
 
 LIMINE_BASE_REVISION(1)
 
@@ -65,7 +66,30 @@ extern "C" void kernel_main()
     }
 
     std::init_stdio();
-    std::printf("HELLO!!!\n");
+    
+    // Find registry files in the modules stack.
+    for (unsigned int i = 0; limine_modules.response->module_count > i; i++)
+    {
+        auto _Module = limine_modules.response->modules[i];
+
+        if (strcmp(_Module->cmdline, "sys_registry") == 0)
+        {
+            const char* registry = (const char*) _Module->address;
+            size_t length = _Module->size;
+
+            if (registry == nullptr)
+            {
+                std::printf("Registry address is null.\n");
+                hcf();
+            }
+
+            if (length == 0)
+            {
+                std::printf("Registry is empty.\n");
+                hcf();
+            }
+        } 
+    }
 
     for (uint i = 0; limine_modules.response->module_count > i; i++)
     {
@@ -84,6 +108,8 @@ extern "C" void kernel_main()
     asm volatile("swapgs");
 
     PCI::scanPCI();
+
+    Multitasking::PerCoreInitialize(0);
 
     std::printf("The address: %llx\n", (void*)&limine_modules);
     // We're done, just hang...

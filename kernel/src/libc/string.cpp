@@ -71,3 +71,73 @@ int strlen(const char* s)
 
     return v;
 }
+
+bool isalnum(char c)
+{
+    return (c >= 'A' && c <= 'Z') ||
+           (c >= 'a' && c <= 'z') ||
+           (c >= '0' && c <= '9');
+}
+
+int strncmp(const char* str1, const char* str2, size_t count)
+{
+    // Iterate through the characters of both strings
+    for (size_t i = 0; i < count; ++i)
+    {
+        // Compare the characters
+        if (str1[i] != str2[i])
+        {
+            // If characters are different, return the difference of their ASCII values
+            return str1[i] - str2[i];
+        }
+
+        // If both characters are null terminators, strings are equal
+        if (str1[i] == '\0')
+        {
+            return 0;
+        }
+    }
+
+    // Strings are equal up to the specified count
+    return 0;
+}
+
+int strcmp(const char* str1, const char* str2)
+{
+    // Loop until either string ends
+    while (*str1 != '\0' || *str2 != '\0')
+    {
+        // Compare characters
+        if (*str1 != *str2)
+        {
+            // Return the difference between the ASCII values of the characters
+            return *str1 - *str2;
+        }
+        
+        // Move to the next character in each string
+        str1++;
+        str2++;
+    }
+    
+    // Strings are equal
+    return 0;
+}
+
+const char* strchr(const char* str, int character) {
+    // Iterate through each character in the string
+    while (*str != '\0') {
+        // Check if the current character matches the specified character
+        if (*str == character) {
+            // Return a pointer to the current character
+            return str;
+        }
+        // Move to the next character
+        str++;
+    }
+    // If the specified character is '\0', return a pointer to the null terminator
+    if (character == '\0') {
+        return str;
+    }
+    // Specified character not found, return nullptr
+    return nullptr;
+}

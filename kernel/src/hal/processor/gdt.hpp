@@ -45,6 +45,19 @@ typedef struct
     uint8_t base2;
 } __attribute__((packed)) gdt_entry;
 
+typedef struct 
+{
+    uint16_t limit0;
+    uint16_t base0;
+    uint8_t base1;
+    uint8_t access_byte;
+    uint8_t limit1 : 4;
+    uint8_t flags : 4;
+    uint8_t base2;
+    uint32_t base3;
+    uint32_t reserved;
+} __attribute__((packed)) system_segment_desc;
+
 #define GDT_ENTRY(base_val, flags_val, limit_val, access_val) \
     {                                                         \
         .limit0 = (limit_val) & 0xFFFF,                       \
@@ -63,4 +76,4 @@ void gdt_init();
 
 #endif
 
-// Thanks to Qwinci for helping a poor soul out there. I love u
+// Thanks to Qwinci for helping a poor soul out there. 

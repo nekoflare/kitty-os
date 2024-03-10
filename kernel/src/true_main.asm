@@ -62,9 +62,9 @@ _start:
     mov cr4, rax
 
     ;; Enable UMIP (disable SGDT, SIDT, SLDT, SMSW and STR instructions for RING 3)
-    mov rax, cr4
-    or rax, 1 << 11
-    mov cr4, rax
+    ;;mov rax, cr4
+    ;;or rax, 1 << 11
+    ;;mov cr4, rax
 
     ;; Enable execute disable and PAE
     mov rax, cr4

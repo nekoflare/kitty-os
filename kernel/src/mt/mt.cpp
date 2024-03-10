@@ -5,6 +5,7 @@
 #include <hal/processor/smp/smp.hpp>
 #include <assert.hpp>
 #include <libc/stdio.hpp>
+#include <libc/string.hpp>
 
 static Spinlock per_core_init_spinlock;
 
@@ -30,6 +31,8 @@ namespace Multitasking
 
         // Get the final tss.
         tss_entry_t* this_tss = (tss_entry_t*) virt_addr;
+
+        memset((void*)this_tss, sizeof(tss_entry_t), 0);
     
         // I guess I can set up new stack
         void* syscall_stack_phys = Memory::alloc_page();
@@ -37,20 +40,36 @@ namespace Multitasking
 
         syscall_stack_virt += (PAGE_SIZE - 1); // To the bottom.
 
+        std::printf("RSP0 syscall stack: %llx\n", syscall_stack_virt);
+        uint32_t rsp0_low = syscall_stack_virt & 0xffffffff;
+        uint32_t rsp0_high = (syscall_stack_virt & 0xffffffff00000000) >> 32;
+        std::printf("Low: %llx High: %llx\n", rsp0_low, rsp0_high);
+
         // Fill it
         // Load RSP0
         this_tss->iopb = sizeof(tss_entry_t);
-        this_tss->rsp0_low = (syscall_stack_virt & 0xffffffff00000000) >> 32;
-        this_tss->rsp0_high = syscall_stack_virt & 0x00000000ffffffff;
+        this_tss->rsp0_low = rsp0_low;
+        this_tss->rsp0_high = rsp0_high;
 
-        // Set it
-        gdt[6].base0 = ((uint64_t)this_tss & 0xffffffff00000000) >> 32;
-        gdt[6].base1 = ((uint64_t)this_tss & 0x00000000ffff0000) >> 16;
-        gdt[6].base2 = ((uint64_t)this_tss & 0x000000000000ffff);
-        gdt[6].limit0 = sizeof(tss_entry_t);
-        gdt[6].limit1 = 0;
-        gdt[6].access_byte = 0x89;
-        gdt[6].flags = SIZE_FLAG;
+        system_segment_desc* sys_segment_desc = (system_segment_desc*) (&gdt[6]);
+
+        // base = this_tss
+        // flags = 0b0100
+        // access byte = 0x89
+        // limit = sizeof(tss)
+        sys_segment_desc->limit0 = sizeof(tss_entry_t) & 0xFFFF;
+        sys_segment_desc->base0 = virt_addr & 0xFFFF;
+        sys_segment_desc->base1 = (virt_addr >> 16) & 0xFF;
+        sys_segment_desc->access_byte = 0x89;  // Present, Ring 0, Type TSS (available)
+        sys_segment_desc->limit1 = (sizeof(tss_entry_t) >> 16) & 0xF;
+        sys_segment_desc->flags = 0b1001;  // Granularity = 1, 32-bit TSS
+        sys_segment_desc->base2 = (virt_addr >> 24) & 0xFF;
+        sys_segment_desc->base3 = (virt_addr >> 32) & 0xFFFFFFFF;
+        sys_segment_desc->reserved = 0;
+
+        uint64_t address = sys_segment_desc->base0 | (sys_segment_desc->base1 << 16) | (sys_segment_desc->base2 << 24) | ((uint64_t)sys_segment_desc->base3 << 32);
+        std::printf("Moments before disaster: %llx\n", address);
+        std::printf("Virt address itself: %llx", virt_addr);
 
         // Load it
         x86_load_tss();

@@ -77,7 +77,7 @@ namespace Memory
     void free_page(u64 page);
     void* malloc(u64 len, u64 virt_address, u64 flags);
 
-    enum PageAttributes
+    enum page_attributes
     {
         PRESENT = 1 << 0,
         READ_WRITE = 1 << 1,

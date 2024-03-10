@@ -20,7 +20,9 @@ gdt_entry __attribute__((packed)) gdt[] = {
     GDT_ENTRY(0, GRAN_4KIB | SIZE_FLAG, 0, PRESENT | RING3 | DESC_TYPE_REG | DESC_TYPE_DATA | READABLE_BIT),
 
     // TSS template
-    GDT_ENTRY(0, 0, 0, 0)
+    //  I DONT KNOW WHAT IM DOING
+    GDT_ENTRY(0, 0, 0, 0),
+    GDT_ENTRY(0, 0, 0, 0),
 };
 
 gdtr_64 gdtr;
