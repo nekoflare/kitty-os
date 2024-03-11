@@ -22,6 +22,7 @@
 #include <mt/mt.hpp>
 #include <kern_registry.hpp>
 #include <exec/elf/elf.hpp>
+#include <arch/amd64/halt.h>
 
 LIMINE_BASE_REVISION(1)
 
@@ -102,6 +103,8 @@ extern "C" void kernel_main()
     }*/
 
     Multitasking::PerCoreInitialize(0);
+
+    halt(NO_REASON);
 
     // We're done, just hang...
     hcf();
