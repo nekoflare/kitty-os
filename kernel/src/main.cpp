@@ -87,7 +87,7 @@ extern "C" void kernel_main()
     PCI::scanPCI();
 
     // Find hello_world
-    for (uint32_t i = 0; limine_modules.response->module_count > i; i++)
+    /*for (uint32_t i = 0; limine_modules.response->module_count > i; i++)
     {
         auto& mod = limine_modules.response->modules[i];
 
@@ -95,15 +95,14 @@ extern "C" void kernel_main()
         {
             std::printf("Found the hello_world application!\n");
 
-            ELF::print_information_elf64(mod->address);
+            //ELF::print_information_elf64(mod->address);
 
             return;
         }
-    }
+    }*/
 
-    // Multitasking::PerCoreInitialize(0);
+    Multitasking::PerCoreInitialize(0);
 
-    std::printf("The address: %llx\n", (void*)&limine_modules);
     // We're done, just hang...
     hcf();
 }

@@ -43,33 +43,24 @@ namespace Multitasking
         std::printf("RSP0 syscall stack: %llx\n", syscall_stack_virt);
         uint32_t rsp0_low = syscall_stack_virt & 0xffffffff;
         uint32_t rsp0_high = (syscall_stack_virt & 0xffffffff00000000) >> 32;
-        std::printf("Low: %llx High: %llx\n", rsp0_low, rsp0_high);
 
-        // Fill it
-        // Load RSP0
-        this_tss->iopb = sizeof(tss_entry_t);
+        // Fill the TSS.
+        this_tss->iopb = 104;
         this_tss->rsp0_low = rsp0_low;
         this_tss->rsp0_high = rsp0_high;
 
-        system_segment_desc* sys_segment_desc = (system_segment_desc*) (&gdt[6]);
+        system_segment_desc* sys_segment_desc = (system_segment_desc*)(&gdt[6]);
 
-        // base = this_tss
-        // flags = 0b0100
-        // access byte = 0x89
-        // limit = sizeof(tss)
-        sys_segment_desc->limit0 = sizeof(tss_entry_t) & 0xFFFF;
-        sys_segment_desc->base0 = virt_addr & 0xFFFF;
-        sys_segment_desc->base1 = (virt_addr >> 16) & 0xFF;
-        sys_segment_desc->access_byte = 0x89;  // Present, Ring 0, Type TSS (available)
-        sys_segment_desc->limit1 = (sizeof(tss_entry_t) >> 16) & 0xF;
-        sys_segment_desc->flags = 0b1001;  // Granularity = 1, 32-bit TSS
-        sys_segment_desc->base2 = (virt_addr >> 24) & 0xFF;
-        sys_segment_desc->base3 = (virt_addr >> 32) & 0xFFFFFFFF;
-        sys_segment_desc->reserved = 0;
+        sys_segment_desc->limit0 = sizeof(tss_entry_t);
+        sys_segment_desc->limit1 = 0;
 
-        uint64_t address = sys_segment_desc->base0 | (sys_segment_desc->base1 << 16) | (sys_segment_desc->base2 << 24) | ((uint64_t)sys_segment_desc->base3 << 32);
-        std::printf("Moments before disaster: %llx\n", address);
-        std::printf("Virt address itself: %llx", virt_addr);
+        sys_segment_desc->access_byte = 0x89;
+        sys_segment_desc->base0 = virt_addr & 0xffff;
+        sys_segment_desc->base1 = (virt_addr & 0xff0000) >> 16;
+        sys_segment_desc->base2 = (virt_addr & 0xff000000) >> 24;
+        sys_segment_desc->base3 = (virt_addr & 0xffffffff00000000) >> 32;
+        sys_segment_desc->flags = 0b0100;
+        sys_segment_desc->reserved = 0; 
 
         // Load it
         x86_load_tss();
