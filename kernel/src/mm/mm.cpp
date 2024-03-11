@@ -1,7 +1,6 @@
 #include <mm/mm.hpp>
 #include <limine.h>
 #include <libc/stdio.hpp>
-#include <drivers/serial/serial.hpp>
 
 namespace Memory
 {
