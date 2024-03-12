@@ -23,6 +23,7 @@
 #include <kern_registry.hpp>
 #include <exec/elf/elf.hpp>
 #include <arch/amd64/halt.h>
+#include <drivers/hwinf.h>
 
 LIMINE_BASE_REVISION(1)
 
@@ -44,10 +45,8 @@ limine_module_request limine_modules = {
     .response = nullptr
 };
 
-void tick()
-{
-    std::printf(".");
-}
+extern driver_structure _driver_array;
+extern driver_structure _driver_array_end;
 
 extern "C" void kernel_main()
 {
@@ -103,6 +102,24 @@ extern "C" void kernel_main()
     }*/
 
     Multitasking::PerCoreInitialize(0);
+
+
+    uint64_t start = (uint64_t)&_driver_array;
+    uint64_t end = (uint64_t)&_driver_array_end;
+    uint64_t diff = end - start;
+    uint64_t driver_count = diff / sizeof(driver_structure);
+
+    std::printf("Driver count: %lld\n", driver_count);
+
+    for (uint64_t i = 0; driver_count > i; i++)
+    {
+        uint64_t new_address = start + (i * sizeof(driver_structure));
+        driver_structure* this_driver = (driver_structure*) new_address;
+
+        std::printf("Driver name: %s\n", this_driver->_driver_info.driver_name);
+    }
+
+    // Iterate through drivers.
 
     halt(NO_REASON);
 

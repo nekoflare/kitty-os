@@ -8,38 +8,40 @@
 
 #include <stdint.h>
 #include <error_codes.hpp>
+#include <types.h>
+#include <stddef.h>
 
 enum driver_type : uint64_t
 {
-    DT_GRAPHICS = 0,
-    DT_AUDIO = 1,
-    DT_AUDIO_VIDEOS = 2,
-    DT_NETWORK = 3,
-    DT_STORAGE = 4,
-    DT_USB = 5,
-    DT_SERIAL = 6,
-    DT_IO = 7,
-    DT_PRINTER = 8
+    DT_INVALID, DT_GRAPHICS, DT_AUDIO, DT_NETWORK, DT_STORAGE, DT_USB, DT_SERIAL, DT_IO, DT_PRINTER
 };
 
-typedef void* CAP_HANDLE;
+struct driver_info {
+    const char* driver_name;
 
-struct driver_common {
-    driver_type drv_type;
-    CAP_HANDLE capabilities_handle;
+    const uint64_t driver_major;
+    const uint64_t driver_minor;
+    const uint64_t driver_build_num;
 };
 
-struct serial_driver_interface : public driver_common
-{
-    ERROR_CODE (*serial_init_function)();
-    ERROR_CODE (*serial_init_port)(unsigned short com_port_idx, unsigned long long flags);
-    ERROR_CODE (*serial_write)(unsigned short com_port_idx, const unsigned char* data, size_t length);
-    ERROR_CODE (*serial_read)(unsigned short com_port_idx, unsigned char* buffer, size_it length);
+struct driver_condition {
+    const uint16_t driver_pci_vendor_id;
+    const uint16_t driver_pci_device_id;
+    const uint8_t driver_pci_class_code;
+    const uint8_t driver_pci_subclass_code;
 };
 
-struct graphics_driver_interface : public driver_common
-{
+#define driver_api __attribute__((section(".drivers"), used))
 
+struct driver_structure {
+    driver_type _driver_type = DT_INVALID;
+    driver_info _driver_info = {"Invalid Driver", 0, 0, 0};
+    driver_condition _driver_condition = {0, 0, 0, 0};
+
+    bool is_driver_inited = false;
+    ERROR_CODE (*driver_init)();
+    ERROR_CODE (*driver_exit)();
+    ERROR_CODE (*driver_ctl_function)(uint64_t ctrl_idx, const char* data_in, char* data_out, size_t data_out_len);
 };
 
 #endif //KITTY_OS_CPP_HWINF_H

@@ -13,6 +13,8 @@ typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 
+typedef uint64_t KIRQ;
+
 enum KO_REASON : uint64_t
 {
     NO_REASON = 0,
