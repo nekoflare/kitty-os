@@ -33,7 +33,7 @@ all-hdd: $(IMAGE_NAME).hdd
 
 .PHONY: run
 run: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -cpu qemu64,+fsgsbase,+syscall,+rdseed -d int -no-shutdown -no-reboot -M smm=off -smp 6 -M q35 -m 4.5G -cdrom $(IMAGE_NAME).iso -boot d
+	qemu-system-x86_64 -cpu qemu64,+fsgsbase,+syscall,+rdseed -d int -no-shutdown -no-reboot -M smm=off -smp 6 -M q35 -m 4.5G -serial file:serial.txt -cdrom $(IMAGE_NAME).iso -boot d
 
 .PHONY: run-uefi
 run-uefi: ovmf $(IMAGE_NAME).iso

@@ -62,14 +62,12 @@ namespace PCI
         {0x1022, 0x43c6, "400 Series Chipset PCIe Bridge"}
     };
 
-    uint32_t readConfigDword(uint8_t bus, uint8_t device, uint8_t function, uint8_t offset)
+    uint32_t read_config_dword(uint32_t bus, uint32_t device, uint32_t function, uint32_t offset)
     {
-        uint32_t address;
-        uint32_t lbus = (uint32_t) bus;
-        uint32_t ldevice = (uint32_t) device;
-        uint32_t lfunction = (uint32_t) function;
+        uint32_t address = (offset | (function << 8) | (device << 11) | (bus << 16)) & 0x80ffffff;
+        address |= (1 << 31);
 
-        address = (uint32_t)((lbus << 16) | (ldevice << 11) | (lfunction << 8) | (offset & 0xFC) | ((uint32_t)0x80000000));
+        std::printf("The PCI address: %llx\n", (uint64_t)address);
 
         Processor::outl(0xcf8, address);
         return Processor::inl(0xCFC);
@@ -119,6 +117,11 @@ namespace PCI
         _pciDeviceCount++;
     }
 
+    void print_full_device_info(uint32_t bus, uint32_t device, uint32_t function, uint32_t offset)
+    {
+
+    }
+
     void scanPCI()
     {
         for (uint8_t bus = 0; bus < 8; bus++)
@@ -127,7 +130,7 @@ namespace PCI
             {
                 for (uint8_t function = 0; function < 8; function++)
                 {
-                    uint32_t vendor_id = PCI::readConfigDword(bus, device, function, 0);
+                    uint32_t vendor_id = read_config_dword(bus, device, function, 0);
                     if (vendor_id == 0xffffffff)
                     {
                         continue;
@@ -135,7 +138,7 @@ namespace PCI
 
 
                     // device found
-                    uint32_t classID = PCI::readConfigDword(bus, device, function, 0x8);
+                    uint32_t classID = read_config_dword(bus, device, function, 0x8);
                     uint8_t classCode = (classID >> 24) & 0xff;
                     uint8_t subclassCode = (classID >> 16) & 0xff;
 

@@ -5,7 +5,7 @@
 #include <drivers/hwinf.h>
 #include "virtio_gpu.h"
 
-static ERROR_CODE virtio_gpu_init()
+static ERROR_CODE virtio_gpu_init(io_handle _IoHandle)
 {
     return SUCCESS;
 }

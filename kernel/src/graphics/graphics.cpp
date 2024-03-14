@@ -3,6 +3,7 @@
 #include <error_codes.hpp>
 #include <math/math.hpp>
 #include <libc/stdio.hpp>
+//#include <serial/Serial.h>
 
 namespace Graphics
 {
@@ -13,24 +14,29 @@ namespace Graphics
 
 ERROR_CODE Graphics::QuickDraw::QDInit()
 {
+    //serial_printf("[INFO] Initiaizing QuickDraw!\n");
     Graphics::LastError = SUCCESS;
 
     // Check count of framebuffers.
     auto fb_count = KeGetFramebufferCount();
     if (0 >= fb_count)
     {
+        //serial_printf("[CRIT] No framebuffers have been found!\n");
         return NO_FRAMEBUFFERS;
     }
 
     auto framebuffers = KeGetFramebufferResponse();
-    Graphics::limine_framebuffers = framebuffers->framebuffers;
-    Graphics::framebuffer_count = fb_count;
 
     if (framebuffers == nullptr)
     {
+        //serial_printf("[CRIT] The framebuffer is null!\n");
         return FRAMEBUFFER_NULL;
     }
 
+    Graphics::limine_framebuffers = framebuffers->framebuffers;
+    Graphics::framebuffer_count = fb_count;
+
+    //serial_printf("[INFO] QuickDraw has been initiated successfully!\n");
     return SUCCESS;
 }
 

@@ -10,6 +10,7 @@
 #include <error_codes.hpp>
 #include <types.h>
 #include <stddef.h>
+#include <hal/processor/gios.h>
 
 enum driver_type : uint64_t
 {
@@ -39,7 +40,7 @@ struct driver_structure {
     driver_condition _driver_condition = {0, 0, 0, 0};
 
     bool is_driver_inited = false;
-    ERROR_CODE (*driver_init)();
+    ERROR_CODE (*driver_init)(io_handle _IoHandle);
     ERROR_CODE (*driver_exit)();
     ERROR_CODE (*driver_ctl_function)(uint64_t ctrl_idx, const char* data_in, char* data_out, size_t data_out_len);
 };

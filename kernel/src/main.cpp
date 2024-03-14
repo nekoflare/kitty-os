@@ -1,29 +1,18 @@
 #include <limine.h>
-#include <hal/processor/extensions/sse.hpp>
-#include <hal/processor/io.hpp>
-#include <kern_api/kern_api.hpp>
-#include <libc/string.hpp>
 #include <graphics/graphics.hpp>
 #include <error_codes.hpp>
-#include <flanterm/flanterm.h>
-#include <flanterm/backends/fb.h>
 #include <libc/stdio.hpp>
-#include <hal/processor/speed.hpp>
-#include <math/math.hpp>
 #include <mm/mm.hpp>
 #include <hal/processor/smp/smp.hpp>
-#include <power/power.hpp>
 #include <hal/bus/pci.hpp>
 #include <hal/processor/gdt.hpp>
-#include <hal/processor/cpuid.hpp>
 #include <hal/processor/access.hpp>
 #include <hal/processor/interrupts/idt.hpp>
-#include <acpi/acpi.hpp>
-#include <mt/mt.hpp>
-#include <kern_registry.hpp>
+#include <mt/mt.hpp>    
 #include <exec/elf/elf.hpp>
 #include <arch/amd64/halt.h>
 #include <drivers/hwinf.h>
+#include <serial/Serial.h>
 
 LIMINE_BASE_REVISION(1)
 
@@ -60,6 +49,19 @@ extern "C" void kernel_main()
         __init_array[i]();
     }
 
+    // Enable all COM ports.
+    Serial serial1(Serial::COM1, Serial::DIV_115200, false);
+    Serial serial2(Serial::COM2, Serial::DIV_115200, false);
+    Serial serial3(Serial::COM3, Serial::DIV_115200, false);
+    Serial serial4(Serial::COM4, Serial::DIV_115200, false);
+    Serial serial5(Serial::COM5, Serial::DIV_115200, false);
+    Serial serial6(Serial::COM6, Serial::DIV_115200, false);
+    Serial serial7(Serial::COM7, Serial::DIV_115200, false);
+    Serial serial8(Serial::COM8, Serial::DIV_115200, false);
+
+    serial1.Write("Hello, World!\n", 14);
+    serial1.Print("%d %x %p %f %s\n", 10, 10, &_driver_array, 6.9f, "Chuj");
+
     auto qd_error = Graphics::QuickDraw::QDInit();
     if (qd_error != SUCCESS)
     {
@@ -68,9 +70,11 @@ extern "C" void kernel_main()
 
     std::init_stdio();
 
+    //serial_printf("System modules: \n");
     for (uint i = 0; limine_modules.response->module_count > i; i++)
     {
         std::printf("Module name: %s Module Address: %p", limine_modules.response->modules[i]->cmdline, limine_modules.response->modules[i]->address);
+        //serial_printf("\tModule name: %s Module address: %llx\n", limine_modules.response->modules[i]->cmdline, limine_modules.response->modules[i]->address);
     }
 
     gdt_init();
