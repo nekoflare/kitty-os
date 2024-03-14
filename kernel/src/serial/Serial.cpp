@@ -80,6 +80,8 @@ void Serial::Print(const char* fmt, ...)
     float number;
     const char* str;
 
+    // Nya
+
     while (*fmt)
     {
         if (*fmt != '%')
