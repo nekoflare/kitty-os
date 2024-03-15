@@ -50,17 +50,6 @@ extern "C" void kernel_main()
     }
 
     // Enable all COM ports.
-    Serial serial1(Serial::COM1, Serial::DIV_115200, false);
-    Serial serial2(Serial::COM2, Serial::DIV_115200, false);
-    Serial serial3(Serial::COM3, Serial::DIV_115200, false);
-    Serial serial4(Serial::COM4, Serial::DIV_115200, false);
-    Serial serial5(Serial::COM5, Serial::DIV_115200, false);
-    Serial serial6(Serial::COM6, Serial::DIV_115200, false);
-    Serial serial7(Serial::COM7, Serial::DIV_115200, false);
-    Serial serial8(Serial::COM8, Serial::DIV_115200, false);
-
-    serial1.Write("Hello, World!\n", 14);
-    serial1.Print("%d %x %p %f %s\n", 10, 10, &_driver_array, 6.9f, "Chuj");
 
     auto qd_error = Graphics::QuickDraw::QDInit();
     if (qd_error != SUCCESS)

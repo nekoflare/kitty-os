@@ -84,7 +84,7 @@ namespace PCI
         return "Unknown Device"; // Return a default name for unknown devices
     }
 
-    void printDevices()
+    void print_devices()
     {
         std::printf("Devices: ");
         for (unsigned int i = 0; _pciDeviceCount > i; i++)
@@ -98,7 +98,7 @@ namespace PCI
         }
     }
 
-    void addDevice(uint16_t vendorID, uint16_t deviceID, uint8_t bus, uint8_t device, uint8_t function, uint8_t _class, uint8_t subclass)
+    void add_devices(uint16_t vendorID, uint16_t deviceID, uint8_t bus, uint8_t device, uint8_t function, uint8_t _class, uint8_t subclass)
     {
         if (_pciDeviceCount > MAX_PCI_DEVS)
         {
@@ -117,7 +117,7 @@ namespace PCI
         _pciDeviceCount++;
     }
 
-    void print_full_device_info(uint32_t bus, uint32_t device, uint32_t function, uint32_t offset)
+    void print_full_device_info(uint32_t bus, uint32_t device, uint32_t function)
     {
 
     }
@@ -142,7 +142,7 @@ namespace PCI
                     uint8_t classCode = (classID >> 24) & 0xff;
                     uint8_t subclassCode = (classID >> 16) & 0xff;
 
-                    PCI::addDevice((uint16_t)(vendor_id & 0xffff), (uint16_t)((vendor_id >> 16) & 0xffff), bus, device, function, classCode, subclassCode); 
+                    PCI::add_devices((uint16_t)(vendor_id & 0xffff), (uint16_t)((vendor_id >> 16) & 0xffff), bus, device, function, classCode, subclassCode); 
                 }
             }
         }
