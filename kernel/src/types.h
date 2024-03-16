@@ -15,6 +15,8 @@ typedef int64_t s64;
 
 typedef uint64_t KIRQ;
 
+typedef unsigned int uint;
+
 enum KO_REASON : uint64_t
 {
     NO_REASON = 0,

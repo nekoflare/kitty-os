@@ -4,7 +4,7 @@
 
 #include "debug.h"
 #include <serial/Serial.h>
-include <stdarg.h>
+#include <stdarg.h>
 
 static Serial* devices[8];
 

@@ -13,6 +13,8 @@
 #include <arch/amd64/halt.h>
 #include <drivers/hwinf.h>
 #include <serial/Serial.h>
+#include <libc/string.hpp>
+#include <terminal/terminal.h>
 
 LIMINE_BASE_REVISION(1)
 
@@ -66,6 +68,37 @@ extern "C" void kernel_main()
         //serial_printf("\tModule name: %s Module address: %llx\n", limine_modules.response->modules[i]->cmdline, limine_modules.response->modules[i]->address);
     }
 
+    // Find the font.
+    // Maybe check in the registry for font.
+    const char* font_name = "zap-light32.psf";
+    const char* this_font = nullptr;
+    std::uint64_t font_size;
+
+    for (uint i = 0; limine_modules.response->module_count > i; i++)
+    {
+        auto this_module = limine_modules.response->modules[i];
+
+        if (memcmp(this_module->cmdline, font_name, strlen(font_name)) == 0)
+        {
+            std::printf("Found the font!\n");
+            this_font = (const char*) this_module->address;
+            font_size = this_module->size;
+
+            break;
+        }
+    }
+
+    if (this_font == nullptr)
+    {
+        std::printf("No font has been found!\n");
+
+        hcf();
+    }
+
+    Terminal term0(this_font, font_size);
+
+    hcf();
+
     gdt_init();
     idt_init();
 
@@ -113,6 +146,8 @@ extern "C" void kernel_main()
     }
 
     // Iterate through drivers.
+
+
 
     halt(NO_REASON);
 
