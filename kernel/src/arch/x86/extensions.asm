@@ -1,6 +1,7 @@
 bits 64
 
 global enable_sse
+global has_sse
 global has_sse2
 global has_sse3
 global has_ssse3
@@ -20,6 +21,22 @@ global enable_avx
 
 global enable_sse_s
 global enable_avx_s
+
+has_sse:
+    push rdx
+
+    mov rax, 1
+    cpuid
+    test rdx, 1 << 25
+    jz .noSSE
+
+    pop rdx
+    mov rax, 1
+    ret
+.noSSE:
+    pop rdx
+    mov rax, 0
+    ret
 
 enable_avx_s:
     call has_avx

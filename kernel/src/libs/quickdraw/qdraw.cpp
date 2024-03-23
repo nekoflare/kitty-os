@@ -69,8 +69,8 @@ void QDraw::DrawPixel(int x, int y, Graphics::color_t color)
 void QDraw::DrawLine(int x1, int y1, int x2, int y2, Graphics::color_t color)
 {
     // Calculate the differences between the endpoints
-    int dx = Math::abs(x2 - x1);
-    int dy = Math::abs(y2 - y1);
+    int dx = ktl::abs(x2 - x1);
+    int dy = ktl::abs(y2 - y1);
 
     // Determine the direction of the line
     int sx = (x1 < x2) ? 1 : -1;
