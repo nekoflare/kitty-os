@@ -18,6 +18,19 @@ global has_avx2
 global has_avx512f
 global enable_avx
 
+global enable_sse_s
+global enable_avx_s
+
+enable_avx_s:
+    call has_avx
+    cmp rax, 0
+    jz .no_avx
+
+    call enable_avx
+.no_avx:
+    ret
+
+enable_sse_s:
 enable_sse:
     push rax
     push rdx
@@ -325,3 +338,37 @@ has_avx2:
     ret
 
 has_avx512f:
+    push rax
+    push rbx
+
+    mov rax, 7
+    cpuid
+    test rbx, 1 << 16
+    jz .no_avx512f
+
+    pop rbx
+    pop rax
+    mov rax, 1
+    ret
+.no_avx512f:
+    pop rbx
+    pop rax
+    mov rax, 0
+    ret
+
+enable_avx:
+    push rax
+    push rcx
+    push rdx
+
+    xor rcx, rcx
+    xgetbv ;; load xcr0
+    or rax, 7
+    xsetbv
+
+    pop rdx
+    pop rcx
+    pop rax
+    ret
+
+    ret
