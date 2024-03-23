@@ -72,11 +72,7 @@ $(IMAGE_NAME).iso: limine kernel
 	mkdir -p iso_root/EFI/BOOT
 	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
-	# cp -v files/autorun.ico iso_root/
-	# mkdir -p iso_root/registry/kernel/
-	# cp -v files/registry/kernel/SysInfo.kr iso_root/registry/kernel/SysInfo.kr
 	cp -r files/* iso_root/
-	# tree iso_root/
 	xorriso -as mkisofs -b limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot limine-uefi-cd.bin \
