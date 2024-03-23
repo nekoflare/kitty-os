@@ -35,14 +35,7 @@ void main()
     this_renderer.DrawRectangle(500, 500, 100, 200, 5, {255, 0, 255});
     this_renderer.DrawFilledRectangle(600, 600, 200, 100, {255, 255, 0});
 
-    ktl::printf(CUTE_COLORS "Hello, World!\n");
-
-    ktl::printf(NRILL_COLORS "Hello, World!\n");
-
-    ktl::printf("\\[b101010\\[fbababaThis is easy!\n");
-
-    ktl::printf(CUTE_COLORS "Float: %f\n", 1.23456f);
-
+    ktl::printf("Build date: " __DATE__ " " __TIME__ "\n");
     ktl::printf(CUTE_COLORS "CPU Features: \n");
     bool first_feature = true; // Track if it's the first feature
 
