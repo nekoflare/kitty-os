@@ -50,7 +50,7 @@ extern "C"
         {
             for (std::size_t i = n; i > 0; i--)
             {
-                pdest[i - 1] = psrc[i = 1];
+                pdest[i - 1] = psrc[i - 1];
             }
         }
 
@@ -88,7 +88,7 @@ extern "C"
     {
         return  (c >= 'A' && c <= 'Z') ||
                 (c >= 'a' && c <= 'z') ||
-                (c >= '0' && <= '9');
+                (c >= '0' && c <= '9');
     }
 
     std::size_t strncmp(const char* s1, const char* s2, std::size_t m)
@@ -131,14 +131,14 @@ extern "C"
         {
             if (*s == c)
             {
-                return str;
+                return s;
             }
 
             ++s;
         }
 
         if (c == '\0')
-            return str;
+            return s;
 
         return nullptr;
     }
