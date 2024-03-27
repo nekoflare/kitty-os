@@ -23,6 +23,9 @@ global enable_sse_s
 global enable_avx_s
 
 has_sse:
+    push rax
+    push rbx
+    push rcx
     push rdx
 
     mov rax, 1
@@ -31,6 +34,9 @@ has_sse:
     jz .noSSE
 
     pop rdx
+    pop rcx
+    pop rbx
+    pop rax
     mov rax, 1
     ret
 .noSSE:
@@ -50,6 +56,8 @@ enable_avx_s:
 enable_sse_s:
 enable_sse:
     push rax
+    push rbx
+    push rcx
     push rdx
 
     ; Check if SSE is supported.
@@ -68,17 +76,23 @@ enable_sse:
     mov cr4, rax
 
     pop rdx
+    pop rcx
+    pop rbx
     pop rax
     mov rax, 1  ; Return true
     ret
 .no_sse:
     pop rdx
+    pop rcx
+    pop rbx
     pop rax
     mov rax, 0 ; Return false
     ret
 
 has_sse2:
     push rax
+    push rbx
+    push rcx
     push rdx
 
     mov rax, 1
@@ -88,18 +102,24 @@ has_sse2:
     jz .no_sse2
 
     pop rdx
+    pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_sse2:
     pop rdx
+    pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_sse3:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
@@ -107,19 +127,25 @@ has_sse3:
 
     jz .no_sse3
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_sse3:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_ssse3:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
@@ -127,12 +153,16 @@ has_ssse3:
 
     jz .no_ssse3
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_ssse3:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
@@ -156,7 +186,9 @@ has_full_sse4:
 
 has_sse4_1:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
@@ -164,19 +196,25 @@ has_sse4_1:
 
     jz .no_sse4_1
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_sse4_1:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_sse4_2:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
@@ -184,19 +222,25 @@ has_sse4_2:
 
     jz .no_sse4_2
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_sse4_2:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_sse4a:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
@@ -204,12 +248,16 @@ has_sse4a:
 
     jz .no_sse4a
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_sse4a:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
@@ -242,95 +290,125 @@ has_full_sse5:
 
 has_xop:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rcx, 1 << 11
     jz .no_xop
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_xop:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_fma4:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rcx, 1 << 16
     jz .no_fma4
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_fma4:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_cvt16:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rcx, 1 << 29
     jz .no_cvt16
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_cvt16:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_avx:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rcx, 1 << 28
     jz .no_avx
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_avx:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
 
 has_xsave:
     push rax
+    push rbx
     push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rcx, 1 << 26
     jz .no_xsave
 
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 1
     ret
 .no_xsave:
+    pop rdx
     pop rcx
+    pop rbx
     pop rax
     mov rax, 0
     ret
@@ -338,17 +416,23 @@ has_xsave:
 has_avx2:
     push rax
     push rbx
+    push rcx
+    push rdx
 
     mov rax, 1
     cpuid
     test rbx, 1 << 5
     jz .no_avx2
 
+    pop rdx
+    pop rcx
     pop rbx
     pop rax
     mov rax, 1
     ret
 .no_avx2:
+    pop rdx
+    pop rcx
     pop rbx
     pop rax
     mov rax, 0
@@ -357,17 +441,23 @@ has_avx2:
 has_avx512f:
     push rax
     push rbx
+    push rcx
+    push rdx
 
     mov rax, 7
     cpuid
     test rbx, 1 << 16
     jz .no_avx512f
 
+    pop rdx
+    pop rcx
     pop rbx
     pop rax
     mov rax, 1
     ret
 .no_avx512f:
+    pop rdx
+    pop rcx
     pop rbx
     pop rax
     mov rax, 0

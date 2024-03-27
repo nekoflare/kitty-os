@@ -7,6 +7,11 @@
 
 #include <cstdint>
 
+namespace Kernel
+{
+    void print_cpu_features();
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
