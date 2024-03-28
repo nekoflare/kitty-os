@@ -8,7 +8,7 @@
 #include <kernel/structures.h>
 #include <libs/kstd/string.h>
 #include <libs/math/math.h>
-#include "stdio.h"
+#include <libs/kstd/stdio.h>
 
 
 namespace ktl
