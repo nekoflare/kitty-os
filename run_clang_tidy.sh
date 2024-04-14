@@ -1,0 +1,1 @@
+find kernel/src -type f \( -name "*.cpp" -o -name "*.h" \) -exec clang-tidy -p compile_commands.txt {} +
